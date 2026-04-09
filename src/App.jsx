@@ -30,7 +30,7 @@ function App() {
         }
 
         const response = await fetch(
-          "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0",
+          "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell",
           {
             headers: {
               Authorization: `Bearer ${hfApiKey}`,
@@ -65,7 +65,7 @@ function App() {
             },
             method: "POST",
             body: JSON.stringify({
-              model: "meta-llama/Meta-Llama-3-8B-Instruct",
+              model: "meta-llama/Meta-Llama-3.1-8B-Instruct",
               messages: [{ role: "user", content: prompt }],
               max_tokens: 500
             }),
