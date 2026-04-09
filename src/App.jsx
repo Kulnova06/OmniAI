@@ -49,50 +49,50 @@ function App() {
         const blob = await response.blob();
         const imageUrl = URL.createObjectURL(blob);
         setGeneratedImg(imageUrl);
-        
+
       } else {
         // Text generation mode
         if (!textApiKey) {
           throw new Error("API Key is missing. Please add VITE_HF_API_KEY or VITE_HF_TEXT_API_KEY to your .env file.");
         }
-
         const response = await fetch(
-          "https://router.huggingface.co/v1/chat/completions",
+          "https://openrouter.ai/api/v1/chat/completions",
           {
+            method: "POST",
             headers: {
-              Authorization: `Bearer ${textApiKey}`,
+              Authorization: `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
               "Content-Type": "application/json",
             },
-            method: "POST",
             body: JSON.stringify({
-              model: "mistralai/Mistral-7B-Instruct-v0.3",
-              messages: [{ role: "user", content: prompt }],
-              max_tokens: 500
+              model: "openai/gpt-4o-mini",
+              messages: [
+                { role: "user", content: prompt }
+              ],
+              max_tokens: 300,
+              temperature: 0.7,
             }),
           }
         );
 
         if (!response.ok) {
-           const errorData = await response.json().catch(() => ({}));
-           throw new Error(errorData.error?.message || errorData.error || `Failed to generate text: ${response.statusText}`);
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData?.error?.message || errorData?.error || `Failed: ${response.statusText}`);
         }
-
         const data = await response.json();
-        
-        if (data.choices && data.choices.length > 0) {
-          setGeneratedText(data.choices[0].message.content);
-        } else {
-          throw new Error("Unexpected response from text API.");
-        }
-      }
+        setGeneratedText(
+          data?.choices?.[0]?.message?.content || "No response"
+        );
+
+      } // ← else close
+
     } catch (err) {
       console.error("Generation error:", err);
       setError(err.message || "An unexpected error occurred while generating.");
     } finally {
       setIsGenerating(false);
     }
-  };
-
+  }
+  // ← handleGenerate properly closed
   const handleModeChange = (newMode) => {
     if (isGenerating) return;
     setMode(newMode);
@@ -103,7 +103,7 @@ function App() {
     <>
       <div className="bg-orb bg-orb-1"></div>
       <div className="bg-orb bg-orb-2"></div>
-      
+
       <div className="app-container">
         <div className="header">
           <h1>Omni AI</h1>
@@ -111,7 +111,7 @@ function App() {
         </div>
 
         <div className="mode-switcher">
-          <button 
+          <button
             className={`mode-btn ${mode === 'image' ? 'active' : ''}`}
             onClick={() => handleModeChange('image')}
             disabled={isGenerating}
@@ -123,7 +123,7 @@ function App() {
             </svg>
             Image
           </button>
-          <button 
+          <button
             className={`mode-btn ${mode === 'text' ? 'active' : ''}`}
             onClick={() => handleModeChange('text')}
             disabled={isGenerating}
@@ -215,4 +215,4 @@ function App() {
   );
 }
 
-export default App;
+export default App
