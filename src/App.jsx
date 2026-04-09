@@ -65,7 +65,7 @@ function App() {
             },
             method: "POST",
             body: JSON.stringify({
-              model: "meta-llama/Meta-Llama-3.1-8B-Instruct",
+              model: "mistralai/Mistral-7B-Instruct-v0.3",
               messages: [{ role: "user", content: prompt }],
               max_tokens: 500
             }),
